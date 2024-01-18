@@ -1,34 +1,75 @@
 import { Planet } from "@simulation/model/planet";
-import { Renderer } from "../renderer/renderer";
+import { Renderer, distanceFromTwoPoints } from "../renderer/renderer";
 
 export function draw(
   ctx: CanvasRenderingContext2D,
   renderer: Renderer,
   planet: Planet
 ) {
-  const [x, y] = renderer.getPositionFromRealWordToPixels(planet.pos);
-  const [waterGradientX, waterGradientY] =
-    renderer.getPositionFromRealWordToPixels([
-      planet.pos[0] - planet.radius * 0.7,
-      planet.pos[1] + planet.radius * 0.7,
-      planet.pos[2],
-    ]);
-  const [radius] = renderer.getSizeFromRealWordToPixels(
-    [planet.radius, planet.radius],
-    planet.pos
+  const a = renderer.getPositionFromRealWordToPixels(planet.pos);
+  const b =
+    [
+      renderer.getPositionFromRealWordToPixels([
+        planet.pos[0] + Math.sin(Math.PI / 4) * planet.radius,
+        planet.pos[1] + Math.sin(Math.PI / 4) * planet.radius,
+        planet.pos[2],
+      ]),
+      renderer.getPositionFromRealWordToPixels([
+        planet.pos[0] - Math.sin(Math.PI / 4) * planet.radius,
+        planet.pos[1] - Math.sin(Math.PI / 4) * planet.radius,
+        planet.pos[2],
+      ]),
+      renderer.getPositionFromRealWordToPixels([
+        planet.pos[0] - Math.sin(Math.PI / 4) * planet.radius,
+        planet.pos[1] + Math.sin(Math.PI / 4) * planet.radius,
+        planet.pos[2],
+      ]),
+      renderer.getPositionFromRealWordToPixels([
+        planet.pos[0] + Math.sin(Math.PI / 4) * planet.radius,
+        planet.pos[1] - Math.sin(Math.PI / 4) * planet.radius,
+        planet.pos[2],
+      ]),
+    ].find((b) => !!b) ?? null;
+  const c =
+    [
+      renderer.getPositionFromRealWordToPixels([
+        planet.pos[0] - Math.sin(Math.PI / 4) * planet.radius * 0.7,
+        planet.pos[1] + Math.sin(Math.PI / 4) * planet.radius * 0.7,
+        planet.pos[2],
+      ]),
+      renderer.getPositionFromRealWordToPixels([
+        planet.pos[0] - Math.sin(Math.PI / 4) * planet.radius * 0.7,
+        planet.pos[1] - Math.sin(Math.PI / 4) * planet.radius * 0.7,
+        planet.pos[2],
+      ]),
+      renderer.getPositionFromRealWordToPixels([
+        planet.pos[0] + Math.sin(Math.PI / 4) * planet.radius * 0.7,
+        planet.pos[1] + Math.sin(Math.PI / 4) * planet.radius * 0.7,
+        planet.pos[2],
+      ]),
+      renderer.getPositionFromRealWordToPixels([
+        planet.pos[0] - Math.sin(Math.PI / 4) * planet.radius * 0.7,
+        planet.pos[1] - Math.sin(Math.PI / 4) * planet.radius * 0.7,
+        planet.pos[2],
+      ]),
+    ].find((c) => !!c) ?? null;
+
+  if (!a || !b || !c) {
+    return;
+  }
+
+  const [x, y] = a;
+  const [xWithRadius, yWithRadius] = b;
+  const [waterGradientX, waterGradientY] = c;
+
+  const radius = distanceFromTwoPoints([x, y], [xWithRadius, yWithRadius]);
+  const waterRadius = distanceFromTwoPoints(
+    [x, y],
+    [waterGradientX, waterGradientY]
   );
-  const [waterMinRadius] = renderer.getSizeFromRealWordToPixels(
-    [planet.radius / 4, planet.radius / 4],
-    planet.pos
-  );
-  const [waterMaxRadius] = renderer.getSizeFromRealWordToPixels(
-    [planet.radius * 1.5, planet.radius * 1.5],
-    planet.pos
-  );
-  const [haloRadius] = renderer.getSizeFromRealWordToPixels(
-    [planet.radius + 500, planet.radius + 500],
-    planet.pos
-  );
+  const waterMinRadius = radius / 4;
+  const waterMaxRadius = radius * 1.5;
+  const haloRadius = radius * 1.01;
 
   if (
     radius < 1 ||
@@ -57,11 +98,11 @@ export function draw(
   ctx.closePath();
 
   const grd = ctx.createRadialGradient(
-    waterGradientX,
-    waterGradientY,
+    x - waterRadius,
+    y - waterRadius,
     waterMinRadius,
-    waterGradientX,
-    waterGradientY,
+    x - waterRadius,
+    y - waterRadius,
     waterMaxRadius
   );
   grd.addColorStop(0, "white");

@@ -16,7 +16,7 @@ const ctx: CanvasRenderingContext2D = canvas.getContext(
   "2d"
 ) as CanvasRenderingContext2D;
 
-const camera: Camera = new Camera([0, 0, 0], [200000, 80000], 600, canvas);
+const camera: Camera = new Camera([0, 0, 0], [20, 10], 600, canvas);
 
 const renderer = new Renderer(camera);
 
@@ -49,8 +49,8 @@ const stars: Star[] = [];
 for (let i = 0; i < 1000; ++i) {
   stars.push(
     makeStar([
-      Math.ceil(Math.random() * 8999000000000) - 4000000000000,
-      Math.ceil(Math.random() * 8999000000000) - 4000000000000,
+      Math.ceil(Math.random() * 1599900000000) - 700000000000,
+      Math.ceil(Math.random() * 609990000000) - 320000000000,
       Math.ceil(Math.random() * 50) + 899900000000,
     ])
   );
@@ -62,13 +62,17 @@ function render() {
     canvasNewSize = null;
   }
 
-  // camera.centerCamera([planet.pos[0], planet.pos[1], 0]);
+  // camera.centerCamera([
+  //   planet.pos[0],
+  //   planet.pos[1],
+  //   planet.pos[2] - planet.radius - 100000,
+  // ]);
 
   ctx.clearRect(0, 0, camera.viewportSize[0], camera.viewportSize[1]);
 
   drawStars(ctx, renderer, stars);
 
-  const objects = [planet, moon, ...spatialObjects];
+  const objects = [moon, planet, ...spatialObjects];
   const sortedObject = objects.sort((a, b) => b.pos[2] - a.pos[2]);
 
   for (let i = 0; i < sortedObject.length; ++i) {
@@ -109,19 +113,19 @@ document.addEventListener("keydown", (event) => {
   }
 
   if (event.code === "ArrowRight") {
-    camera.pos[0] += 1000;
+    camera.zRotation += Math.PI / 64;
   }
 
   if (event.code === "ArrowLeft") {
-    camera.pos[0] -= 1000;
+    camera.zRotation -= Math.PI / 64;
   }
 
   if (event.code === "ArrowUp") {
-    camera.pos[2] += 1000;
+    camera.pos[2] += 2000;
   }
 
   if (event.code === "ArrowDown") {
-    camera.pos[2] -= 1000;
+    camera.pos[2] -= 2000;
   }
   // do something
 

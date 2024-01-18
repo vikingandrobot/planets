@@ -9,12 +9,14 @@ export function draw(
   for (let i = 0; i < stars.length; ++i) {
     const star = stars[i];
 
-    const [x, y] = renderer.getPositionFromRealWordToPixels(star.pos);
+    const screenPos = renderer.getPositionFromRealWordToPixels(star.pos);
 
-    const [theoriticalWidth] = renderer.getSizeFromRealWordToPixels(
-      [80000, 80000],
-      star.pos
-    );
+    if (!screenPos) {
+      continue;
+    }
+
+    const [x, y] = screenPos;
+    const theoriticalWidth = 0;
 
     let w = theoriticalWidth;
     if (theoriticalWidth < 1) {
